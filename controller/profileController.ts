@@ -25,7 +25,7 @@ export const editProfile = async (req: Request, res: Response) => {
             data:getUpdate
         })
         
-    } catch (error)
+    } catch (error:any)
     {
         return res.status(400).json({
             message: 'failed to update profile',
@@ -56,7 +56,7 @@ export const editImage = async (req:any, res: Response) => {
         })
 
         
-    } catch (error)
+    } catch (error:any)
     {
         return res.status(400).json({
             message: error.message,

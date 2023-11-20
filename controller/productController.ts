@@ -71,7 +71,7 @@ export const creatProduct = async (req:any, res:Response) =>{
         
         
 
-    }catch(error){
+    }catch(error:any){
         return res.status(400).json({
             message: 'failed to create product',
             error: error.message

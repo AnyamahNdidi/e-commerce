@@ -49,7 +49,7 @@ export const createCat = async(req:Request, res:Response) =>{
             message:dataCat
         })
 
-    }catch(error){
+    }catch(error:any){
             return res.status(400).json({
             message: error.message,
             error: error.message
