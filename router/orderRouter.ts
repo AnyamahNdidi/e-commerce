@@ -8,7 +8,4 @@ router.route("/order-checkout/:userId").post(checkOut)
 
 
 
-
-
-
 export default router;

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 interface products {
     name: string,
-    img: string,
+    img: {}[],
     desc:string,
     qty:number,
     price: string
@@ -17,9 +17,7 @@ const proSchema = new mongoose.Schema({
     name: {
         type:String
     },
-    img: {
-        type:String
-    },
+    img:  [mongoose.Schema.Types.Mixed],
     desc: {
         type:String
     },

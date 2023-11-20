@@ -6,7 +6,7 @@ import { editProfile,editImage} from "../controller/profileController"
 
 
 router.route("/edit/pro/:proId").put(editProfile)
-router.route("/edit/image/:proId").put(upload, editImage)
+router.route("/edit/image/:proId").put(upload.single("image"), editImage)
 
 
 export default router;

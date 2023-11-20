@@ -5,6 +5,7 @@ interface user {
     email: string,
     password: string
     profile: {},
+    verify:boolean,
     role:string,
 }
 interface iUser extends user, mongoose.Document{ }
@@ -20,6 +21,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ["user", "admin", "superadmin"],
         default:"user",
+    },
+    verify: {
+        type: Boolean,
+        default:false,
+        
     },
     password: {
         type:String

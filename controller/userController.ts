@@ -3,6 +3,25 @@ import authModel from "../model/authModel"
 import profileModle from "../model/profileModle"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
+import nodemailer from "nodemailer"
+import {verifyUserEmail} from "../utils/emailverification"
+
+
+
+const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+     service:"gmail",
+  port: 587,
+  secure: true,
+  auth: {
+    // TODO: replace `user` and `pass` values from <https://forwardemail.net>
+    user: "Ndidiedwin89@gmail.com",
+    pass: "vyxy dmjm wlcn jkhw",
+  },
+})
+
+
+
 
 export const  registerUser = async (req:Request, res:Response) => {
     try
@@ -48,11 +67,49 @@ export const  registerUser = async (req:Request, res:Response) => {
 
         createProfile.user = creteData._id
         createProfile.save()
+
+
+        verifyUserEmail(userName, email, creteData._id).then((result:any) => {
+					console.log("message been sent to you: ");
+				})
+            .catch((error: any) => console.log(error));
+
+        // let mailOption = {
+        //     from: '"Edwin store 👻💋🎶🔽" <noreply@unitsore.com>', // sender address
+        //     to: email, // list of receivers
+        //     subject: "EDWIN STORE", // Subject line
+        //     html: `<b>PLEASE CLICK THE LINK <a href="http://localhost:9002/api/v1/account-verify/${creteData._id}"\>link</a> to verify account</b`, // html body
+        // }
+
+        // await transporter.sendMail(mailOption, (error, info) => {
+        //     if (error)
+        //     {
+        //          console.log("error sendinf mail", error)
+        //     } else
+        //     {
+        //         console.log("email send", info.response)
+        //     }
+        // })
+
+
+
+
+
+
+        // await transporter.sendMail(mailoption, (error, info)=>{
+        //     if (error)3
+        //     {
+        //         console.log("error sendinf mail", error)
+        //     } else
+        //     {
+        //         console.log("email send", info.response)
+        //     }
+        // })
         
 
         return res.status(201).json({
-            message: "registeration sucessfully",
-            data:creteData
+            message: "registeration sucessfully check email to verify account",
+            // data:creteData
         })
         
     } catch (error:any)
@@ -69,14 +126,17 @@ export const LoginUser = async(req:Request, res:Response) => {
     try
     {
         const { email, password } = req.body
-         const user:any = await authModel.findOne({ email: email})
+        const user: any = await authModel.findOne({ email: email })
+        console.log(user)
 
         if (user)
         {
             const checkPassword = await bcrypt.compare(password, user.password)
             if (checkPassword)
             {
-                const {password, ...info } = user._doc
+                if (user.verify)
+                {
+                     const {password, ...info } = user._doc
                 
                 let options: any = {
                     expiresIn: "1d"
@@ -91,12 +151,38 @@ export const LoginUser = async(req:Request, res:Response) => {
 ,
                         // token: token
                     })
+                    
+                } else
+                {
+            let mailOption = {
+            from: '"Edwin store 👻💋🎶🔽" <noreply@unitsore.com>', // sender address
+            to: email, // list of receivers
+            subject: "EDWIN STORE", // Subject line
+            html: "<b>PLEASE CLICK THE LINK <a href=`http://localhost:9002/api/v1/account-verify/${user._id}`>link</a> to verify account</b>", // html body
+        }
+
+        await transporter.sendMail(mailOption, (error:any, info:any) => {
+            if (error)
+            {
+                 console.log("error sendinf mail", error)
+            } else
+            {
+                console.log("email send", info.response)
+            }
+        })
+                    
+                    return res.status(200).json({
+                        message: "please check your email to verify account",
+                       
+                    })
+                }
+               
             } else
             {
                   return res.status(404).json({
             message: "wrong password",
             
-        })
+            })
                 
             }
         } else
@@ -106,13 +192,44 @@ export const LoginUser = async(req:Request, res:Response) => {
             
         })
         }
-    } catch (error)
+    } catch (error:any)
     {
           return res.status(404).json({
             message: error.message,
             
         })
     }
+}
+
+
+export const verifyUser = async(req:Request, res:Response) => {
+
+    try
+    {
+        const user = await authModel.findById(req.params.id)
+        console.log(user)
+
+        const verifyData = await authModel.findByIdAndUpdate(
+            req.params.id,
+            {
+              verify:true  
+            },
+            {new:true}
+        )
+
+        return res.status(201).json({
+            message:"account has been verify procees to login"
+        })
+        
+        
+    } catch (error:any){
+        return res.status(404).json({
+            message: error.message,
+            
+        })
+     }
+    
+    
 }
 
 export const logOut = async(req:Request, res:Response) => {
@@ -125,7 +242,7 @@ export const logOut = async(req:Request, res:Response) => {
             mesaage:"Signout successfully"
         })
         
-    } catch (error){
+    } catch (error:any){
         return res.status(404).json({
             message: error.message,
             

@@ -27,18 +27,28 @@ export const creatProduct = async (req:any, res:Response) =>{
          console.log(getUser)
         // const {userId} = req.params
         // console.log(userId)
+
+         const files: any = req.files;
+
+        const imagePath:any = []
+        
+        for (const image of files.images)
+        {
+            const imageUplaoded:any = await cloudinary.uploader.upload(image.path)
+            console.log("this is image", imageUplaoded)
+             imagePath.push(imageUplaoded?.secure_url);
+        }
+
+            console.log("oh god",files.images)
         if (req.user.role === "admin")
         {
-           
-       
-
         const dataProduct:any = await productModel.create({
             name,
             desc,
             qty,
             price,
             category,
-            img:"imahe.jgp"
+            img:imagePath
         })
 
         getCat?.products.push(new mongoose.Types.ObjectId(dataProduct._id))
@@ -46,14 +56,11 @@ export const creatProduct = async (req:any, res:Response) =>{
 
         dataProduct.createdby = getUser
         dataProduct.save()
-
-
+            
          return res.status(201).json({
                 success:1,
                message:dataProduct
            }) 
-
-
         } else
         {
               return res.status(201).json({

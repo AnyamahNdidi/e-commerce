@@ -7,11 +7,11 @@ import {mainApp} from "./mainApp"
 const app: Application = express()
 mainApp(app)
 
+app.set("view engine", "ejs")
+
 const server = app.listen(port, () => {
     console.log(`Server listeningxcv on ports ${port}`)
 })
-
-
 
 process.on("uncaughtException", (error:Error) => {
      console.log("stop here: uncaughtException  ")
